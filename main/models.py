@@ -53,8 +53,6 @@ class Student(models.Model):
         upload_to=ContentTypeRestrictedFileField.update_student_photo_filename,
         content_types=['image/jpg', 'image/png', 'image/gif'],
         max_upload_size=1500000,
-        null=True,
-        blank=True,
     )
 
     # Object name for display in admin panel
