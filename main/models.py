@@ -92,6 +92,19 @@ class AttendanceRecord(models.Model):
         return "%s | %s | %s" % (self.student.matric, self.lab_session.lab_group, self.status)
 
 
+class LabGroupStudentPair(models.Model):
+    """
+    Represents a Lab Group belonging to a specific Course. Related to :model:'Course`.
+    """
+    lab_group = models.ForeignKey(LabGroup, on_delete=models.CASCADE, help_text="Lab Group")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, help_text="Student")
+
+    # Object name for display in admin panel
+    def __str__(self):
+        return "%s - %s ( %s )" % (self.student.matric, self.lab_group.course, self.lab_group.lab_group_name)
+
+
+
 # class AccountProfile(models.Model):
 #     """
 #     Represents a account's profile. Related to :model:`auth.User` and :model:`main.Class`.
