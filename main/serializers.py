@@ -39,5 +39,7 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TakeAttendanceWithFaceRecognitionSerializer(serializers.Serializer):
+    photo = serializers.ImageField()
 
 

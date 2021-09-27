@@ -60,7 +60,10 @@ api_urls = [
     path('api-auth/', include('rest_framework.urls')),
     path(api_prefix + '/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path(api_prefix + '/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(api_prefix + '/session/<int:pk>/take-attendance/', views.TakeAttendanceWithFaceRecognitionView.as_view()),
 ]
+
+urlpatterns += api_urls
 
 # ViewSet routers, order matters
 router = DefaultRouter()

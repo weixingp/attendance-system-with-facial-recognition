@@ -36,7 +36,7 @@ class FaceRecognitionManager:
         for record in self.records:
             student = record[0]
             encoding = record[1]
-            match = face_recognition.compare_faces(encoding, unknown_encoding, tolerance=0.45)
+            match = face_recognition.compare_faces([encoding], unknown_encoding, tolerance=0.45)[0]
             if match:
                 # Return the student obj if match found
                 return student

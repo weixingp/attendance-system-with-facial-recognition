@@ -1,10 +1,15 @@
+from django.http import Http404
 from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from main.models import *
 from main.serializers import *
+from main.utils.FaceRecognition import FaceRecognitionManager
 from main.utils.permissions import NonAdminReadOnly
 
 
@@ -169,6 +174,41 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     serializer_class = LabGroupStudentPairSerializer
     permission_classes = [NonAdminReadOnly, ]
 
+
+class TakeAttendanceWithFaceRecognitionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TakeAttendanceWithFaceRecognitionSerializer
+
+    @staticmethod
+    def get_session(pk):
+        try:
+            return LabSession.objects.get(pk=pk)
+        except LabSession.DoesNotExist:
+            raise Http404
+
+    def post(self, request, pk):
+        session = self.get_session(pk)
+        lab_grp = session.lab_group
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        photo = serializer.validated_data["photo"]
+
+        manager = FaceRecognitionManager(lab_group=lab_grp)
+        result = manager.recognise_student(photo=photo)
+        if result:
+            success = True
+            student_data = StudentSerializer(result).data
+        else:
+            success = False
+            student_data = None
+
+        res = {
+            "success": success,
+            "student": student_data
+        }
+
+        return Response(res)
 
 # class StudentsInGroupViewSet(viewsets.ModelViewSet):
 #     """
