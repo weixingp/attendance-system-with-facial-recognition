@@ -20,6 +20,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework.documentation import include_docs_urls
+from rest_framework.routers import DefaultRouter
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -27,6 +28,8 @@ from rest_framework_simplejwt.views import (
 )
 
 # Swagger documentation setup
+from main import views
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Attendance Taking APP API",
@@ -51,3 +54,12 @@ urlpatterns = [
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
+
+
+# API Views
+api_prefix = "api/v1"
+
+# ViewSet routers, order matters
+router = DefaultRouter()
+router.register(api_prefix + r'/course', views.CourseViewSet)
+urlpatterns += router.urls
