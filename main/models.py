@@ -9,8 +9,8 @@ class Course(models.Model):
     """
     Represents a Course that Students registered for. Related to :model:`Lab Group`.
     """
-    course_code = models.CharField(max_length=128, unique=True)  # need to set unique
-    course_name = models.CharField(max_length=128)
+    course_code = models.CharField(max_length=128, unique=True, help_text="Course Code (Eg. CZ3002)")  # need to set unique
+    course_name = models.CharField(max_length=128, help_text="Course Name (Eg. Software Engineering)")
 
     def __str__(self):
         return self.course_code
@@ -21,7 +21,7 @@ class LabGroup(models.Model):
     Represents a Lab Group belonging to a specific Course. Related to :model:'Course`.
     """
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lab_group_name = models.CharField(max_length=64)
+    lab_group_name = models.CharField(max_length=64, help_text="Lab Group Name (Eg. FSP3)")
 
     # Object name for display in admin panel
     def __str__(self):
@@ -32,7 +32,7 @@ class LabSession(models.Model):
     """
     Represents a Lab Session belonging to a specific Lab Group. Related to :model:'Lab Group`.
     """
-    session_name = models.CharField(max_length=64)
+    session_name = models.CharField(max_length=64, help_text="Session Name (Eg. Lab 1, Lab 2)")
     lab_group = models.ForeignKey(LabGroup, on_delete=models.CASCADE)
     date_time_start = models.DateTimeField(null=False, auto_now=False)
     date_time_end = models.DateTimeField(null=False, auto_now=False)
@@ -46,8 +46,8 @@ class Student(models.Model):
     """
     Represents a student. Related to :model:'Lab Group`.
     """
-    name = models.CharField(max_length=64)
-    matric = models.CharField(max_length=9, unique=True)
+    name = models.CharField(max_length=64, help_text="Student Name)")
+    matric = models.CharField(max_length=9, unique=True, help_text="Student Matric Number)")
     lab_group = models.ForeignKey(LabGroup, on_delete=models.CASCADE)
     photo = ContentTypeRestrictedFileField(
         upload_to=ContentTypeRestrictedFileField.update_student_photo_filename,
@@ -80,9 +80,9 @@ class AttendanceRecord(models.Model):
         choices=ATTENDANCE_STATUS,
         help_text="Attendance status"
     )
-    date_time_captured = models.DateTimeField(null=True)
-    date_time_modified = models.DateTimeField(auto_now=True)
-    remarks = models.CharField(max_length=256)
+    date_time_captured = models.DateTimeField(null=True, help_text="Date Time of Attendance Capture")
+    date_time_modified = models.DateTimeField(auto_now=True, help_text="Date Time Last Modified")
+    remarks = models.CharField(max_length=256, help_text="Special Remarks (Eg. Late due to car breakdown)")
 
     def __str__(self):
         return "%s | %s | %s" % (self.student.matric, self.lab_session.lab_group, self.status)
