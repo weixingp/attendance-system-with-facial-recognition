@@ -39,3 +39,5 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
+
