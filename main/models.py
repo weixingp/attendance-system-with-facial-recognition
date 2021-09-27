@@ -80,6 +80,10 @@ class AttendanceRecord(models.Model):
         choices=ATTENDANCE_STATUS,
         help_text="Attendance status"
     )
+    is_taken_with_facial_recognition = models.BooleanField(
+        default=False,
+        help_text="Check if this record is created with facial recognition module"
+    )
     date_time_captured = models.DateTimeField(null=True, help_text="Date Time of Attendance Capture")
     date_time_modified = models.DateTimeField(auto_now=True, help_text="Date Time Last Modified")
     remarks = models.CharField(max_length=256, help_text="Special Remarks (Eg. Late due to car breakdown)")
