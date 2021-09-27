@@ -62,9 +62,9 @@ api_prefix = "api"
 # ViewSet routers, order matters
 router = DefaultRouter()
 router.register(api_prefix + r'/course', views.CourseViewSet)
-router.register(api_prefix + r'/labgroup', views.LabGroupViewSet)
-router.register(api_prefix + r'/labsession', views.LabSessionViewSet)
-router.register(api_prefix + r'/labgroupstudentpair', views.LabGroupStudentPairViewSet)
+router.register(api_prefix + r'/group', views.LabGroupViewSet)
+router.register(api_prefix + r'/session', views.LabSessionViewSet)
+router.register(api_prefix + r'/lab-group-student-pair', views.LabGroupStudentPairViewSet)
 router.register(api_prefix + r'/student', views.StudentViewSet)
-router.register(api_prefix + r'/attendancerecord', views.AttendanceRecordViewSet)
+router.register(api_prefix + r'/attendance', views.AttendanceRecordViewSet)
 urlpatterns += router.urls
