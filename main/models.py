@@ -48,7 +48,6 @@ class Student(models.Model):
     """
     name = models.CharField(max_length=64, help_text="Student Name)")
     matric = models.CharField(max_length=9, unique=True, help_text="Student Matric Number)")
-    lab_group = models.ForeignKey(LabGroup, on_delete=models.CASCADE)
     photo = ContentTypeRestrictedFileField(
         upload_to=ContentTypeRestrictedFileField.update_student_photo_filename,
         content_types=['image/jpg', 'image/png', 'image/gif'],
