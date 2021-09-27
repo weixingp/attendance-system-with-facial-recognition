@@ -2,8 +2,12 @@ from django.http import Http404
 from django.shortcuts import render
 
 # Create your views here.
+from drf_yasg.openapi import Schema
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
+from rest_framework.generics import CreateAPIView
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -175,9 +179,10 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     permission_classes = [NonAdminReadOnly, ]
 
 
-class TakeAttendanceWithFaceRecognitionView(APIView):
+class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = TakeAttendanceWithFaceRecognitionSerializer
+    parser_classes = (MultiPartParser,)
 
     @staticmethod
     def get_session(pk):
@@ -186,7 +191,21 @@ class TakeAttendanceWithFaceRecognitionView(APIView):
         except LabSession.DoesNotExist:
             raise Http404
 
+    # def get_serializer(self):
+    #     return self.serializer_class
+    #
+    # def get_queryset(self):
+    #     if getattr(self, 'swagger_fake_view', False):
+    #         # queryset just for schema generation metadata
+    #         return LabSession.objects.none()
+
+    @swagger_auto_schema(
+        responses={200: TakeAttendanceSuccessSerializer()},
+    )
     def post(self, request, pk):
+        """
+        API endpoint that allows attendance to be submitted with photo of student's face
+        """
         session = self.get_session(pk)
         lab_grp = session.lab_group
 
@@ -199,15 +218,14 @@ class TakeAttendanceWithFaceRecognitionView(APIView):
         if result:
             success = True
             student_data = StudentSerializer(result).data
+
         else:
             success = False
             student_data = None
 
-        res = {
-            "success": success,
-            "student": student_data
-        }
-
+        s = TakeAttendanceSuccessSerializer(data={"success": success, "student": student_data})
+        s.is_valid(raise_exception=False)
+        res = s.data
         return Response(res)
 
 # class StudentsInGroupViewSet(viewsets.ModelViewSet):

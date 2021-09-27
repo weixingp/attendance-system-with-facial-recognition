@@ -1,3 +1,4 @@
+from drf_yasg import openapi
 from rest_framework import serializers
 
 from main.models import *
@@ -39,7 +40,29 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TakeAttendanceSuccessSerializer(serializers.Serializer):
+    success = serializers.BooleanField(help_text="If attendance taking is successful")
+    student = StudentSerializer(help_text="Display student info if the attendance taking is successful is successful")
+
+
+class PhotoField(serializers.ImageField):
+    class Meta:
+        swagger_schema_fields = {
+            "type": openapi.TYPE_OBJECT,
+            "title": "Photo",
+            "properties": {
+                "photo": openapi.Schema(
+                    title="Photo",
+                    type=openapi.TYPE_STRING,
+                )
+            },
+            "required": ["photo"],
+        }
+
+
 class TakeAttendanceWithFaceRecognitionSerializer(serializers.Serializer):
-    photo = serializers.ImageField()
+    photo = serializers.ImageField(help_text="Photo containing student's face", label="Photo")
 
 
+class TakeAttendanceFakeSerializer(serializers.Serializer):
+    photo = serializers.CharField(help_text="Photo containing student's face")
