@@ -46,9 +46,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('docs/', include_docs_urls(title='Attendance Taking Webapp')),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -59,13 +56,18 @@ urlpatterns = [
 # API Views
 api_prefix = "api"
 
+api_urls = [
+    path('api-auth/', include('rest_framework.urls')),
+    path(api_prefix + '/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(api_prefix + '/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+
 # ViewSet routers, order matters
 router = DefaultRouter()
 router.register(api_prefix + r'/course', views.CourseViewSet)
 router.register(api_prefix + r'/group', views.LabGroupViewSet)
 router.register(api_prefix + r'/session', views.LabSessionViewSet)
-router.register(api_prefix + r'/lab-group-student-pair', views.LabGroupStudentPairViewSet)
+router.register(api_prefix + r'/student-in-lab-group', views.LabGroupStudentPairViewSet)
 router.register(api_prefix + r'/student', views.StudentViewSet)
 router.register(api_prefix + r'/attendance', views.AttendanceRecordViewSet)
-router.register(api_prefix + r'/studentlist', views.StudentsInGroupViewSet)
 urlpatterns += router.urls

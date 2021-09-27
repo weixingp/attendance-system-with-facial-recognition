@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 
 # Create your views here.
@@ -89,8 +90,6 @@ class LabSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [NonAdminReadOnly, ]
 
 
-
-
 class StudentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows Students to be viewed or updated.
@@ -172,38 +171,53 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     permission_classes = [NonAdminReadOnly, ]
 
 
-class StudentsInGroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows students in a specific Lab Group to be viewed or updated.
-
-    retrieve:
-        Return a Student Lab Group Pair instance.
-
-    list:
-        Return all students in Lab Group, ordered by most recently created.
-
-    create:
-        Create a new student Lab Group Pair .
-
-    delete:
-        Remove an existing Lab Group Student Pair.
-
-    partial_update:
-        Update one or more fields on an existing Lab Group Student Pair.
-
-    update:
-        Update a Lab Group Student Pair.
-    """
-    queryset = LabGroupStudentPair.objects.all().order_by('-id')
-    serializer_class = LabGroupStudentPairSerializer
-    permission_classes = [NonAdminReadOnly, ]
-
-    @action(methods=['get'], detail=True)
-    def studentlist(self, request, pk=group_id):
-        try:
-            student_in_lab_group = LabGroupStudentPair.objects.get('lab_group' == pk)
-        except student_in_lab_group.DoesNotExist:
-            return Response({"error": "Lab Group not found."},
-                            status=status.HTTP_400_BAD_REQUEST)
-        studentlist = student_in_lab_group.objects.distinct('student')
-        return Response(LabGroupStudentPairSerializer(studentlist, many=True))
+# class StudentsInGroupViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows students in a specific Lab Group to be viewed or updated.
+#
+#     retrieve:
+#         Return a Student Lab Group Pair instance.
+#
+#     list:
+#         Return all students in Lab Group, ordered by most recently created.
+#
+#     create:
+#         Create a new student Lab Group Pair .
+#
+#     delete:
+#         Remove an existing Lab Group Student Pair.
+#
+#     partial_update:
+#         Update one or more fields on an existing Lab Group Student Pair.
+#
+#     update:
+#         Update a Lab Group Student Pair.
+#     """
+#
+#     serializer_class = LabGroupStudentPairSerializer
+#     permission_classes = [NonAdminReadOnly, ]
+#
+#     def get_queryset(self):
+#         group_id = self.kwargs['group_id']
+#         queryset = LabGroupStudentPair.objects.filter(group_id=group_id).order_by('-id')
+#         return queryset
+#
+#     # @staticmethod
+#     # def get_students_in_lab_group(pk):
+#     #     try:
+#     #         return LabGroupStudentPair.objects.get(pk=pk)
+#     #     except LabGroupStudentPair.DoesNotExist:
+#     #         raise Http404
+#
+#     # def get(self, request, pk):
+#     #     students_in_lab_group = self.get_students_in_lab_group(pk)
+#     #
+#     # @action(methods=['get'], detail=True)
+#     # def studentlist(self, request, pk=group_id):
+#     #     try:
+#     #         student_in_lab_group = LabGroupStudentPair.objects.get('lab_group' == pk)
+#     #     except student_in_lab_group.DoesNotExist:
+#     #         return Response({"error": "Lab Group not found."},
+#     #                         status=status.HTTP_400_BAD_REQUEST)
+#     #     studentlist = student_in_lab_group.objects.distinct('student')
+#     #     return Response(LabGroupStudentPairSerializer(studentlist, many=True))
