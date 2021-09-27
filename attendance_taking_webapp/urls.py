@@ -57,7 +57,7 @@ urlpatterns = [
 
 
 # API Views
-api_prefix = "api/v1"
+api_prefix = "api"
 
 # ViewSet routers, order matters
 router = DefaultRouter()
