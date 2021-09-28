@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import render
 
@@ -6,6 +7,7 @@ from drf_yasg.openapi import Schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
@@ -124,6 +126,26 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     permission_classes = [NonAdminReadOnly, ]
     parser_classes = (MultiPartParser,)
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        serializer.is_valid(raise_exception=True)
+        student = serializer.save()
+        verified = FaceRecognitionManager.check_photo(student.photo)
+
+        if not verified:
+            err = ValidationError(detail="No face detected in student photo")
+            err.status_code = 500
+            raise err
+
+    @transaction.atomic
+    def perform_update(self, serializer):
+        student = super().perform_create(serializer)
+        verified = FaceRecognitionManager.check_photo(student.photo)
+        if not verified:
+            err = ValidationError(detail="No face detected in student photo")
+            err.status_code = 500
+            raise err
 
 
 class AttendanceRecordViewSet(viewsets.ModelViewSet):
