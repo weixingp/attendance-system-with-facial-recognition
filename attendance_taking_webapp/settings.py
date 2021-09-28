@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'coreapi',
     'drf_yasg',
     'django_seed',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
