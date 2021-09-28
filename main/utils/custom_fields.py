@@ -48,6 +48,6 @@ class ContentTypeRestrictedFileField(FileField):
 
     @staticmethod
     def update_student_photo_filename(instance, filename):
-        path = "media/student_profile/"
+        path = "student_profile/"
         file_format = uuid.uuid4().hex + "." + filename.split('.')[-1]
         return os.path.join(path, file_format)
