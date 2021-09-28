@@ -123,6 +123,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all().order_by('-id')
     serializer_class = StudentSerializer
     permission_classes = [NonAdminReadOnly, ]
+    parser_classes = (MultiPartParser,)
 
 
 class AttendanceRecordViewSet(viewsets.ModelViewSet):
@@ -216,14 +217,17 @@ class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
         manager = FaceRecognitionManager(lab_group=lab_grp)
         result = manager.recognise_student(photo=photo)
         if result:
-            success = True
-            student_data = StudentSerializer(result).data
-
+            # Todo: Add attendance record if successful
+            data = {
+                "success": True,
+                "student": StudentSerializer(result).data,
+            }
         else:
-            success = False
-            student_data = None
+            data = {
+                "success": False,
+            }
 
-        s = TakeAttendanceSuccessSerializer(data={"success": success, "student": student_data})
+        s = TakeAttendanceSuccessSerializer(data=data)
         s.is_valid(raise_exception=False)
         res = s.data
         return Response(res)
