@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import models
 
 
@@ -58,6 +59,14 @@ class Student(models.Model):
     # Object name for display in admin panel
     def __str__(self):
         return self.name + " - " + self.matric
+
+    def delete_face_recognition_cache(self):
+        results = LabGroupStudentPair.objects.filter(student=self)
+        for result in results:
+            sessions = LabSession.objects.filter(lab_group=result.lab_group)
+            for session in sessions:
+                cache_key = f"session_id_{session.id}"
+                cache.delete(cache_key)
 
 
 class AttendanceRecord(models.Model):

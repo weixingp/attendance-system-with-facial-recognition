@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import render
@@ -13,6 +14,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from attendance_taking_webapp.settings import DEFAULT_CACHE_TIME
 from main.models import *
 from main.serializers import *
 from main.utils.FaceRecognition import FaceRecognitionManager
@@ -140,12 +142,20 @@ class StudentViewSet(viewsets.ModelViewSet):
 
     @transaction.atomic
     def perform_update(self, serializer):
-        student = super().perform_create(serializer)
+        serializer.is_valid(raise_exception=True)
+        student = serializer.save()
         verified = FaceRecognitionManager.check_photo(student.photo)
+
         if not verified:
             err = ValidationError(detail="No face detected in student photo")
             err.status_code = 500
             raise err
+
+        student.delete_face_recognition_cache()
+
+    def perform_destroy(self, instance):
+        instance.delete_face_recognition_cache()
+        super(StudentViewSet, self).perform_destroy(instance)
 
 
 class AttendanceRecordViewSet(viewsets.ModelViewSet):
@@ -201,6 +211,20 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     serializer_class = LabGroupStudentPairSerializer
     permission_classes = [NonAdminReadOnly, ]
 
+    def perform_create(self, serializer):
+        serializer.is_valid(raise_exception=True)
+        student_in_lab_grp = serializer.save()
+        student_in_lab_grp.student.delete_face_recognition_cache()
+
+    def perform_update(self, serializer):
+        serializer.is_valid(raise_exception=True)
+        student_in_lab_grp = serializer.save()
+        student_in_lab_grp.student.delete_face_recognition_cache()
+
+    def perform_destroy(self, instance):
+        instance.student.delete_face_recognition_cache()
+        super(LabGroupStudentPairViewSet, self).perform_destroy(instance)
+
 
 class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -241,7 +265,14 @@ class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         photo = serializer.validated_data["photo"]
 
-        manager = FaceRecognitionManager(lab_group=lab_grp)
+        cache_key = f"session_id_{session.id}"
+        cache_value = cache.get(cache_key)
+        if cache_value is not None:
+            manager = cache_value
+        else:
+            manager = FaceRecognitionManager(lab_group=lab_grp)
+            cache.set(cache_key, manager, DEFAULT_CACHE_TIME)
+
         result = manager.recognise_student(photo=photo)
         if result:
             # Todo: Add attendance record if successful
