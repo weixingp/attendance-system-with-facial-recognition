@@ -6,6 +6,8 @@ from django.forms import forms
 from django.template.defaultfilters import filesizeformat
 from django.utils.translation import ugettext_lazy as _
 
+from attendance_taking_webapp.settings_local import MEDIA_ROOT
+
 
 class ContentTypeRestrictedFileField(FileField):
     """
@@ -46,6 +48,6 @@ class ContentTypeRestrictedFileField(FileField):
 
     @staticmethod
     def update_student_photo_filename(instance, filename):
-        path = "student_profile/"
+        path = MEDIA_ROOT + "student_profile/"
         file_format = uuid.uuid4().hex + "." + filename.split('.')[-1]
         return os.path.join(path, file_format)

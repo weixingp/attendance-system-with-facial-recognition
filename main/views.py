@@ -207,6 +207,11 @@ class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
     serializer_class = TakeAttendanceWithFaceRecognitionSerializer
     parser_classes = (MultiPartParser,)
 
+    def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            # queryset just for schema generation metadata
+            return LabSession.objects.none()
+
     @staticmethod
     def get_session(pk):
         try:
