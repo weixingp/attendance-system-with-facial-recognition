@@ -6,9 +6,26 @@ from main.models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, max_length=128)
+
     class Meta:
         model = User
-        fields = '__all__'
+        read_only_fields = ('is_active', 'id', "date_joined", "last_login")
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'is_superuser': {'help_text': "Determine if the account type is Admin or TA account. Default false (TA Account)"}
+        }
+
+        fields = [
+            "id",
+            "last_login",
+            "is_superuser",
+            "username",
+            "password",
+            "email",
+            "is_active",
+            "date_joined"
+        ]
 
 
 class CourseSerializer(serializers.ModelSerializer):
