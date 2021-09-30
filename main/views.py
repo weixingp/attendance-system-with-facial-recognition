@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,6 +20,33 @@ from main.models import *
 from main.serializers import *
 from main.utils.FaceRecognition import FaceRecognitionManager
 from main.utils.permissions import NonAdminReadOnly
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows user to be viewed or updated.
+
+    retrieve:
+        Return a user instance.
+
+    list:
+        Return all users, ordered by most recently created.
+
+    create:
+        Create a new user.
+
+    delete:
+        Remove an existing user.
+
+    partial_update:
+        Update one or more fields on an existing user.
+
+    update:
+        Update a user.
+    """
+    queryset = User.objects.all().order_by('-id')
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser, ]
 
 
 class CourseViewSet(viewsets.ModelViewSet):

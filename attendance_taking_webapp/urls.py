@@ -73,4 +73,5 @@ router.register(api_prefix + r'/session', views.LabSessionViewSet)
 router.register(api_prefix + r'/student-in-lab-group', views.LabGroupStudentPairViewSet)
 router.register(api_prefix + r'/student', views.StudentViewSet)
 router.register(api_prefix + r'/attendance', views.AttendanceRecordViewSet)
+router.register(api_prefix + r'/account', views.UserViewSet)
 urlpatterns += router.urls
