@@ -128,6 +128,7 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     permission_classes = [NonAdminReadOnly, ]
     parser_classes = (MultiPartParser,)
+    filterset_fields = ('matric', )
 
     @transaction.atomic
     def perform_create(self, serializer):
