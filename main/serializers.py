@@ -6,8 +6,6 @@ from main.models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, max_length=128)
-
     class Meta:
         model = User
         read_only_fields = ('is_active', 'id', "date_joined", "last_login")

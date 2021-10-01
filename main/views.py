@@ -239,6 +239,7 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     queryset = LabGroupStudentPair.objects.all().order_by('-id')
     serializer_class = LabGroupStudentPairSerializer
     permission_classes = [NonAdminReadOnly, ]
+    filterset_fields = ('student__matric', )
 
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
