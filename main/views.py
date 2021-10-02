@@ -212,6 +212,7 @@ class AttendanceRecordViewSet(viewsets.ModelViewSet):
     queryset = AttendanceRecord.objects.all().order_by('-id')
     serializer_class = AttendanceRecordSerializer
     permission_classes = [NonAdminReadOnly, ]
+    filterset_fields = ('lab_session',)
 
 
 class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
