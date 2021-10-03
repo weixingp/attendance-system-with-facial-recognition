@@ -101,6 +101,9 @@ class AttendanceRecord(models.Model):
         help_text="Special Remarks (Eg. Late due to car breakdown)"
     )
 
+    class Meta:
+        unique_together = ('student', 'lab_session',)
+
     def __str__(self):
         return "%s | %s | %s" % (self.student.matric, self.lab_session.lab_group, self.status)
 
