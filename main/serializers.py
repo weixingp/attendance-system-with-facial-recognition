@@ -65,11 +65,11 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
 class TakeAttendanceSuccessSerializer(serializers.Serializer):
     success = serializers.BooleanField(help_text="If attendance taking is successful")
     student = StudentSerializer(
-        help_text="Display student info if attendance taking is successful",
+        help_text="Display student info",
         required=False
     )
     attendance = AttendanceRecordSerializer(
-        help_text="Display the attendance details if attendance taking is successful",
+        help_text="Display the attendance details",
         required=False
     )
 

@@ -4,6 +4,7 @@ from django.http import Http404
 from django.shortcuts import render
 
 # Create your views here.
+from django.utils.timezone import localtime
 from drf_yasg.openapi import Schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, permissions
@@ -285,6 +286,7 @@ class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
     @swagger_auto_schema(
         responses={200: TakeAttendanceSuccessSerializer()},
     )
+    @transaction.atomic
     def post(self, request, pk):
         """
         API endpoint that allows attendance to be submitted with photo of student's face
@@ -307,14 +309,30 @@ class TakeAttendanceWithFaceRecognitionView(CreateAPIView):
         result = manager.recognise_student(photo=photo)
         if result:
             # Todo: Add attendance record if successful
-            data = {
-                "success": True,
-                "student": StudentSerializer(result).data,
-            }
+
+            attendance_record = AttendanceRecord.objects.filter(student=result, lab_session=session)
+            if not attendance_record:
+                attendance = AttendanceRecord.objects.create(
+                    student=result,
+                    lab_session=session,
+                    status="1",
+                    is_taken_with_facial_recognition=True,
+                    date_time_captured=localtime()
+                )
+
+                data = {
+                    "success": True,
+                    "student": StudentSerializer(result).data,
+                    "attendance": AttendanceRecordSerializer(attendance).data
+                }
+            else:
+                err = ValidationError(detail="Attendance for this student has already been recorded for this lab session.")
+                err.status_code = 500
+                raise err
         else:
-            data = {
-                "success": False,
-            }
+            err = ValidationError(detail="Unable to identify the student, perhaps the student is not in this lab group.")
+            err.status_code = 500
+            raise err
 
         s = TakeAttendanceSuccessSerializer(data=data)
         s.is_valid(raise_exception=False)
