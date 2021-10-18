@@ -241,7 +241,7 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     queryset = LabGroupStudentPair.objects.all().order_by('-id')
     serializer_class = LabGroupStudentPairSerializer
     permission_classes = [NonAdminReadOnly, ]
-    filterset_fields = ('student__matric', )
+    filterset_fields = ('student__matric', 'lab_group__id', )
 
     def perform_create(self, serializer):
         serializer.is_valid(raise_exception=True)
@@ -256,6 +256,18 @@ class LabGroupStudentPairViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         instance.student.delete_face_recognition_cache()
         super(LabGroupStudentPairViewSet, self).perform_destroy(instance)
+
+    # def list(self, request, *args, **kwargs):
+    #     # do your customization here
+    #     queryset = self.get_queryset()
+    #     serializer = self.get_serializer(many=True)
+    #     print(serializer.data)
+    #     data = serializer.data
+    #     for item in data:
+    #         print(item)
+    #         student = Student.objects.get(pk=item["student"])
+    #         item["student"] = StudentSerializer(student).data
+    #     return Response(data)
 
 
 class TakeAttendanceWithFaceRecognitionView(CreateAPIView):

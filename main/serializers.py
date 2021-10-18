@@ -25,16 +25,27 @@ class UserSerializer(serializers.ModelSerializer):
             "date_joined"
         ]
 
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        super().update(instance, validated_data)
+        if password:
+            instance.set_password(password)
+            instance.save()
+        return instance
+
+
+
 
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = '__all__'
-
-
-class LabGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LabGroup
         fields = '__all__'
 
 
@@ -47,6 +58,12 @@ class LabSessionSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
+        fields = '__all__'
+
+
+class LabGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabGroup
         fields = '__all__'
 
 
